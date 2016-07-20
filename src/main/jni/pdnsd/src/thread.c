@@ -62,7 +62,7 @@ void thread_sig(int sig)
 		pthread_exit(NULL);
 	} else {
 		crash_msg("An error occured at startup.");
-		_exit(1);
+		_exit(54);
 	}
 }
 #endif
@@ -82,4 +82,3 @@ void usleep_r(unsigned long usec)
 #endif
 }
 #endif
-

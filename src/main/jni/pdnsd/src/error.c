@@ -61,7 +61,7 @@ void crash_msg(char *msg)
  * the optional following arguments are the arguments like in printf */
 void log_message(int prior, const char *s, ...)
 {
-#ifndef ANDROID
+//#ifndef ANDROID
 	int gotlock=0;
 	va_list va;
 	FILE *f;
@@ -88,7 +88,7 @@ void log_message(int prior, const char *s, ...)
 	if(debug_p) {
 		f=dbg_file;
 	printtofile:
-#endif
+//#endif
 		{
 			char ts[sizeof "* 12/31 23:59:59| "];
 			time_t tt = time(NULL);

@@ -194,41 +194,6 @@ LOCAL_SRC_FILES := $(addprefix shadowsocks-libev/libudns/,$(UDNS_SOURCES))
 
 include $(BUILD_STATIC_LIBRARY)
 
-########################################################
-## libev 
-########################################################
-
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := libev
-LOCAL_CFLAGS += -O2 -DNDEBUG -DHAVE_CONFIG_H
-LOCAL_SRC_FILES := \
-	libev/ev.c \
-	libev/event.c 
-
-include $(BUILD_STATIC_LIBRARY)
-
-########################################################
-## redsocks
-########################################################
-
-include $(CLEAR_VARS)
-
-REDSOCKS_SOURCES := base.c http-connect.c \
-	log.c md5.c socks5.c \
-	base64.c http-auth.c http-relay.c main.c \
-	parser.c redsocks.c socks4.c utils.c
-
-LOCAL_STATIC_LIBRARIES := libevent
-
-LOCAL_MODULE := redsocks
-LOCAL_SRC_FILES := $(addprefix redsocks/, $(REDSOCKS_SOURCES)) 
-LOCAL_CFLAGS := -O2 -std=gnu99 -DUSE_IPTABLES \
-	-I$(LOCAL_PATH)/redsocks \
-	-I$(LOCAL_PATH)/libevent/include \
-	-I$(LOCAL_PATH)/libevent
-
-include $(BUILD_EXECUTABLE)
 
 ########################################################
 ## pdnsd
@@ -244,58 +209,6 @@ LOCAL_CFLAGS    := -DANDROID -Wall -O2 -I$(LOCAL_PATH)/pdnsd
 
 include $(BUILD_EXECUTABLE)
 
-########################################################
-## shadowsocks-libev local
-########################################################
-
-include $(CLEAR_VARS)
-
-SHADOWSOCKS_SOURCES := local.c cache.c udprelay.c encrypt.c utils.c netutils.c json.c jconf.c acl.c android.c
-
-LOCAL_MODULE    := ss-local
-LOCAL_SRC_FILES := $(addprefix shadowsocks-libev/src/, $(SHADOWSOCKS_SOURCES))
-LOCAL_CFLAGS    := -Wall -O2 -fno-strict-aliasing -DUDPRELAY_LOCAL \
-					-DUSE_CRYPTO_OPENSSL -DANDROID -DHAVE_CONFIG_H \
-					-I$(LOCAL_PATH)/libev \
-					-I$(LOCAL_PATH)/libancillary \
-					-I$(LOCAL_PATH)/openssl/include  \
-					-I$(LOCAL_PATH)/shadowsocks-libev/libudns \
-					-I$(LOCAL_PATH)/shadowsocks-libev/libcork/include \
-					-I$(LOCAL_PATH)/shadowsocks-libev/libsodium/src/libsodium/include \
-					-I$(LOCAL_PATH)/shadowsocks-libev/libsodium/src/libsodium/include/sodium \
-					-I$(LOCAL_PATH)/shadowsocks-libev/libipset/include
-
-LOCAL_STATIC_LIBRARIES := libev libcrypto libipset libcork libudns libsodium libancillary
-
-LOCAL_LDLIBS := -llog
-
-include $(BUILD_EXECUTABLE)
-
-########################################################
-## shadowsocks-libev tunnel
-########################################################
-
-include $(CLEAR_VARS)
-
-SHADOWSOCKS_SOURCES := tunnel.c cache.c udprelay.c encrypt.c utils.c netutils.c json.c jconf.c android.c
-
-LOCAL_MODULE    := ss-tunnel
-LOCAL_SRC_FILES := $(addprefix shadowsocks-libev/src/, $(SHADOWSOCKS_SOURCES))
-LOCAL_CFLAGS    := -Wall -O2 -fno-strict-aliasing -DUDPRELAY_LOCAL -DUDPRELAY_TUNNEL \
-					-DUSE_CRYPTO_OPENSSL -DANDROID -DHAVE_CONFIG_H -DSSTUNNEL_JNI \
-					-I$(LOCAL_PATH)/libev \
-					-I$(LOCAL_PATH)/libancillary \
-					-I$(LOCAL_PATH)/shadowsocks-libev/libudns \
-					-I$(LOCAL_PATH)/shadowsocks-libev/libcork/include \
-					-I$(LOCAL_PATH)/shadowsocks-libev/libsodium/src/libsodium/include \
-					-I$(LOCAL_PATH)/shadowsocks-libev/libsodium/src/libsodium/include/sodium \
-					-I$(LOCAL_PATH)/openssl/include 
-
-LOCAL_STATIC_LIBRARIES := libev libcrypto libsodium libcork libudns libancillary
-
-LOCAL_LDLIBS := -llog
-
-include $(BUILD_EXECUTABLE)
 
 ########################################################
 ## system

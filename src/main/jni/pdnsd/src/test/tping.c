@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 
 	if (argc!=2) {
 		printf("Usage: %s <address>\n",argv[0]);
-		exit(1);
+		exit(53);
 	}
 #ifdef ENABLE_IPV4
 	if (inet_aton(argv[1],&a.ipv4)) {

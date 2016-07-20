@@ -121,12 +121,12 @@ static int uptest (servparm_t *serv, int j)
 			 */
 			if (setgid(getgid()) == -1 || setuid(getuid()) == -1) {
 				log_error("Could not reset uid or gid: %s",strerror(errno));
-				_exit(1);
+				_exit(46);
 			}
 			/* Try to setuid() to a different user as specified. Good when you
 			   don't want the test command to run as root */
 			if (!run_as(serv->uptest_usr)) {
-				_exit(1);
+				_exit(47);
 			}
 			{
 			    struct rlimit rl; int i;
@@ -135,17 +135,17 @@ static int uptest (servparm_t *serv, int j)
 			     */
 			    if (getrlimit(RLIMIT_NOFILE, &rl) == -1) {
 				    log_error("getrlimit() failed: %s",strerror(errno));
-				    _exit(1);
+				    _exit(48);
 			    }
 			    for (i = 0; i < rl.rlim_max; i++) {
 				    if (fcntl(i, F_SETFD, FD_CLOEXEC) == -1 && errno != EBADF) {
 					    log_error("fcntl(F_SETFD) failed: %s",strerror(errno));
-					    _exit(1);
+					    _exit(49);
 				    }
 			    }
 			}
 			execl("/bin/sh", "uptest_sh","-c",serv->uptest_cmd,(char *)NULL);
-			_exit(1); /* failed execl */
+			_exit(50); /* failed execl */
 		} else { /* parent */
 			int status;
 			pid_t wpid = waitpid(pid,&status,0);

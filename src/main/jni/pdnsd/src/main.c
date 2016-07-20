@@ -187,11 +187,6 @@ int final_init()
 		log_error("tcp and udp initialization failed. Exiting.");
 		return 0;
 	}
-	if (global.strict_suid) {
-		if (!run_as(global.run_as)) {
-			return 0;
-		}
-	}
 	return 1;
 }
 
@@ -235,7 +230,7 @@ int main(int argc,char *argv[])
 				DEFAULT_IPV4_6_PREFIX,__FILE__,__LINE__);
 			if(err)
 				perror("inet_pton");
-			exit(1);
+			exit(11);
 		}
 	}
 #endif
@@ -248,16 +243,16 @@ int main(int argc,char *argv[])
 		if (strcmp(arg,"-h")==0 || strcmp(arg,"--help")==0) {
 			fputs(info_message,stdout);
 			fputs(help_message,stdout);
-			exit(1);
+			exit(12);
 		} else if (strcmp(arg,"-V")==0 || strcmp(arg,"--version")==0) {
 			fputs(info_message,stdout);
-			exit(1);
+			exit(13);
 		} else if (strcmp(arg,"-c")==0 || strcmp(arg,"--config-file")==0) {
 			if (++i<argc) {
 				conf_file=argv[i];
 			} else {
 				fprintf(stderr,"Error: file name expected after %s option.\n",arg);
-				exit(1);
+				exit(36);
 			}
 		} else if (strcmp(arg,"-4")==0) {
 #ifdef ENABLE_IPV4
@@ -266,7 +261,7 @@ int main(int argc,char *argv[])
 # endif
 #else
 			fprintf(stderr,"Error: -4: pdnsd was compiled without IPv4 support.\n");
-			exit(1);
+			exit(37);
 #endif
 		} else if (strcmp(arg,"-6")==0) {
 #ifdef ENABLE_IPV6
@@ -275,7 +270,7 @@ int main(int argc,char *argv[])
 # endif
 #else
 			fprintf(stderr,"Error: -6: pdnsd was compiled without IPv6 support.\n");
-			exit(1);
+			exit(14);
 #endif
 		} else if (strcmp(arg,"-a")==0) {
 #if defined(ENABLE_IPV4) && defined(ENABLE_IPV6)
@@ -283,7 +278,7 @@ int main(int argc,char *argv[])
 			if(rv<0) {
 				fprintf(stderr,"Error: -a: can't check availability of IPv6: %s\n"
 					"Try using -4 or -6 option instead.\n",strerror(errno));
-				exit(1);
+				exit(15);
 			}
 			if((run_ipv4= !rv))
 				fprintf(stderr,"Switching to IPv4 mode.\n");
@@ -296,7 +291,7 @@ int main(int argc,char *argv[])
 #ifdef ENABLE_IPV6
 				if(inet_pton(AF_INET6,argv[i],&global.ipv4_6_prefix)<=0) {
 					fprintf(stderr,"Error: %s: argument not a valid IPv6 address.\n",arg);
-					exit(1);
+					exit(16);
 				}
 				cmdline.prefix=1;
 #else
@@ -304,7 +299,7 @@ int main(int argc,char *argv[])
 #endif
 			} else {
 				fprintf(stderr,"Error: IPv6 address expected after %s option.\n",arg);
-				exit(1);
+				exit(38);
 			}
 		} else if (strcmp(arg,"-s")==0 || strcmp(arg,"--status")==0) {
 			global.stat_pipe=1; cmdline.stat_pipe=1;
@@ -326,50 +321,50 @@ int main(int argc,char *argv[])
 				global.pidfile=argv[i]; cmdline.pidfile=1;
 			} else {
 				fprintf(stderr,"Error: file name expected after -p option.\n");
-				exit(1);
+				exit(17);
 			}
 		} else if (strncmp(arg,"-v",2)==0) {
 			if (strlen(arg)!=3 || !isdigit(arg[2])) {
 				fprintf(stderr,"Error: one digit expected after -v option (like -v2).\n");
-				exit(1);
+				exit(18);
 			}
 			global.verbosity=arg[2]-'0'; cmdline.verbosity=1;
 		} else if (strncmp(arg,"-m",2)==0) {
 			if (strlen(arg)!=4) {
 				fprintf(stderr,"Error: uo, to or tu expected after the  -m option (like -muo).\n");
-				exit(1);
+				exit(19);
 			}
 			if (strcmp(&arg[2],"uo")==0) {
 #ifdef NO_UDP_QUERIES
 				fprintf(stderr,"Error: pdnsd was compiled without UDP support.\n");
-				exit(1);
+				exit(20);
 #else
 				global.query_method=UDP_ONLY;
 #endif
 			} else if (strcmp(&arg[2],"to")==0) {
 #ifdef NO_TCP_QUERIES
 				fprintf(stderr,"Error: pdnsd was compiled without TCP support.\n");
-				exit(1);
+				exit(21);
 #else
 				global.query_method=TCP_ONLY;
 #endif
 			} else if (strcmp(&arg[2],"tu")==0) {
 #if defined(NO_UDP_QUERIES) || defined(NO_TCP_QUERIES)
 				fprintf(stderr,"Error: pdnsd was not compiled with UDP and TCP support.\n");
-				exit(1);
+				exit(33);
 #else
 				global.query_method=TCP_UDP;
 #endif
 			} else if (strcmp(&arg[2],"ut")==0) {
 #if defined(NO_UDP_QUERIES) || defined(NO_TCP_QUERIES)
 				fprintf(stderr,"Error: pdnsd was not compiled with UDP and TCP support.\n");
-				exit(1);
+				exit(34);
 #else
 				global.query_method=UDP_TCP;
 #endif
 			} else {
 				fprintf(stderr,"Error: uo, to, tu or ut expected after the  -m option (like -muo).\n");
-				exit(1);
+				exit(35);
 			}
 			cmdline.query_method=1;
 		} else if (strcmp(arg,"-g")==0 || strcmp(arg,"--debug")==0) {
@@ -395,7 +390,7 @@ int main(int argc,char *argv[])
 #ifdef ENABLE_IPV6
 					if(inet_pton(AF_INET6,valstr,&global.ipv4_6_prefix)<=0) {
 						fprintf(stderr,"Error: --ipv4_6_prefix: argument not a valid IPv6 address.\n");
-						exit(1);
+						exit(22);
 					}
 					cmdline.prefix=1;
 #else
@@ -404,11 +399,11 @@ int main(int argc,char *argv[])
 				}
 				else {
 					fprintf(stderr,"Error: unknown option: %.*s\n",plen,arg);
-					exit(1);
+					exit(23);
 				}
 			} else {
 				fprintf(stderr,"Error: unknown option: %s\n",arg);
-				exit(1);
+				exit(24);
 			}
 		}
 	}
@@ -463,7 +458,7 @@ int main(int argc,char *argv[])
 	if (global.daemon && global.pidfile) {
 		if (unlink(global.pidfile)!=0 && errno!=ENOENT) {
 			log_error("Error: could not unlink pid file %s: %s",global.pidfile, strerror(errno));
-			exit(1);
+			exit(40);
 		}
 		if ((pfd=open(global.pidfile,O_WRONLY|O_CREAT|O_EXCL
 #ifdef O_NOFOLLOW
@@ -479,7 +474,7 @@ int main(int argc,char *argv[])
 			      , 0600))==-1)
 		{
 			log_error("Error: could not open pid file %s: %s",global.pidfile, strerror(errno));
-			exit(1);
+			exit(25);
 		}
 	}
 	for (i=0;i<DA_NEL(servers);i++) {
@@ -490,10 +485,10 @@ int main(int argc,char *argv[])
 	}
 
 	if (!init_rng())
-		exit(1);
+		exit(26);
 #if (TARGET==TARGET_LINUX)
 	if (!final_init())
-		exit(1);
+		exit(39);
 #endif
 
 	{
@@ -514,7 +509,7 @@ int main(int argc,char *argv[])
 		pid=fork();
 		if (pid==-1) {
 			log_error("Could not become a daemon: fork #1 failed: %s",strerror(errno));
-			exit(1);
+			exit(27);
 		}
 		if (pid!=0) {
 			/* This is the parent.
@@ -526,12 +521,12 @@ int main(int argc,char *argv[])
 		/* dissociate from controlling terminal */
 		if (setsid()==-1) {
 			log_error("Could not become a daemon: setsid failed: %s",strerror(errno));
-			_exit(1);
+			_exit(28);
 		}
 		pid=fork();
 		if (pid==-1) {
 			log_error("Could not become a daemon: fork #2 failed: %s",strerror(errno));
-			_exit(1);
+			_exit(44);
 		}
 		if (pid!=0) {
 			int exitval=0;
@@ -555,13 +550,13 @@ int main(int argc,char *argv[])
 			log_warn("Cannot chdir to root directory: %s",strerror(errno));
 		if ((fd=open("/dev/null",O_RDONLY))==-1) {
 			log_error("Could not become a daemon: open for /dev/null failed: %s",strerror(errno));
-			_exit(1);
+			_exit(29);
 		}
 		dup2(fd,0);
 		close(fd);
 		if ((fd=open("/dev/null",O_WRONLY))==-1) {
 			log_error("Could not become a daemon: open for /dev/null failed: %s",strerror(errno));
-			_exit(1);
+			_exit(30);
 		}
 		dup2(fd,1);
 		dup2(fd,2);
@@ -588,7 +583,7 @@ int main(int argc,char *argv[])
 
 #if (TARGET!=TARGET_LINUX)
 	if (!final_init())
-		_exit(1);
+		_exit(45);
 #endif
 	DEBUG_MSG(SEL_IPVER("Using IPv4.\n", "Using IPv6.\n"));
 
@@ -632,7 +627,7 @@ int main(int argc,char *argv[])
 		/* Generate a key for storing our thread id's */
 		if ((err=pthread_key_create(&thrid_key, NULL)) != 0) {
 			log_error("pthread_key_create failed: %s",strerror(err));
-			_exit(1);
+			_exit(32);
 		}
 	}
 #endif
@@ -650,7 +645,7 @@ int main(int argc,char *argv[])
 #if (TARGET==TARGET_LINUX)
 		if (!global.strict_suid) {
 			if (!run_as(global.run_as)) {
-				_exit(1);
+				_exit(31);
 			}
 		}
 #endif

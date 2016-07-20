@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 {
 	if (argc!=2) {
 		printf("Usage: %s <interface>\n",argv[0]);
-		exit(1);
+		exit(51);
 	}
 	printf("if_up: %s - %s\n",argv[1],if_up(argv[1])?"up":"down");
 	return 0;
